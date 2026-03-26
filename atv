@@ -1,0 +1,55 @@
+#!/bin/bash
+
+# This is a text viewer, not an editor. There
+# is a difference between editing and viewing,
+# so do NOT confuse yourself.
+
+# Made with boredness as i was bored, hope u like this pile of bash scripts for a simple text viewer
+# that contains information about the file.
+
+FILE="$1"
+if [ ! -f "$FILE" ]; then echo -e "File not found or no file specified\n\nUsage: atv [file]"; exit 1; fi
+
+ABSPATH=$(realpath "$FILE")
+FSIZE=$(wc -c < "$FILE")
+TOTAL_LINES=$(wc -l < "$FILE")
+START_LINE=1
+
+tput civis
+trap "tput cnorm; clear; exit" INT TERM EXIT
+
+while true; do
+    rows=$(tput lines)
+    cols=$(tput cols)
+    TEXT_HEIGHT=$((rows - 1)) 
+    tput cup 0 0
+    
+    sed -n "${START_LINE},$((START_LINE + TEXT_HEIGHT - 1))p" "$FILE" | while IFS= read -r line; do
+        printf "%-${cols}s\n" "${line:0:$cols}"
+    done
+
+    tput cup $((rows - 1)) 0
+    printf "\e[7m %-$(($cols - 1))s \e[0m" " [W] Up | [S] Down | [I] Info | [Q] Quit | Line: $START_LINE/$TOTAL_LINES "
+
+    read -n 1 -s KEY
+
+    case "$KEY" in
+    [Ww]) 
+        if [ "$START_LINE" -gt 1 ]; then
+            ((START_LINE--))
+        fi
+        ;;
+    [Ss]) 
+        if [ "$START_LINE" -lt "$TOTAL_LINES" ]; then
+            ((START_LINE++))
+        fi
+        ;;
+        [Ii])
+            tput cnorm; clear
+            echo -e "Path: $ABSPATH\nSize: $FSIZE bytes\nLines: $TOTAL_LINES\n\nPress any key..."
+            read -n 1 -s
+            tput civis; clear
+            ;;
+        [Qq]) break ;;
+    esac
+done
