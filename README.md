@@ -1,11 +1,16 @@
-# Project Title
+# atv - Ashley's Text Viewer
 
-Description of the project.
+A simple Bash text viewer that displays file contents along with file information and metadata.
 
-## Installation
-
-Instructions on how to install the project.
+## Features
+- View text file contents from the command line
+- Display file information (size, permissions, last modified date, etc.)
+- Quick and lightweight text viewing utility
 
 ## Usage
 
-Information on how to use the project.
+```bash
+./atv filename.txt
+```
+
+This will display the file contents along with useful file metadata.
